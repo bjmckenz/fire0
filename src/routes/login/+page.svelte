@@ -1,61 +1,35 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { signInWithEmailAndPassword } from 'firebase/auth';
-	import { firebaseAuth } from '$lib/firebase';
-	import { authUser } from '$lib/authStore';
-	import { target } from '$lib/targetAfterLogin';
+	import { invalidateAll } from '$app/navigation';
 
-	let email;
-	let password;
-	let success;
+	// returned from the load() function
+	export let data = {};
+	// returned from the login action
+	export let form;
 
-	const login = () => {
-		signInWithEmailAndPassword(firebaseAuth, email, password)
-			.then((userCredentials) => {
-				$authUser = {
-					uid: userCredentials.user.uid,
-					email: userCredentials.user.email || '',
-					picture: userCredentials.user.photoURL || ''
-				};
+	invalidateAll();
 
-				const dest = $target || '/';
-				$target = undefined;
-				console.log('logged in', {userCredentials, $target, dest});
-				goto(dest);
-			})
-			.catch((error) => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
-				console.log(errorCode, errorMessage);
-
-				success = false;
-			});
-	};
 </script>
 
-<form
-	class="flex flex-col gap-4 p-8 space-y-4 bg-white sm:w-10/12"
-	on:submit|preventDefault={login}
->
+{#if form?.missing}<p class="error">Email and password are both required</p>{/if}
+{#if form?.invalid}<p class="error">Invalid credentials!</p>{/if}
+
+<form method="POST" class="flex flex-col gap-4 p-8 space-y-4 bg-white sm:w-10/12" action="?/login">
 	<input
 		type="email"
-		placeholder="Email"
+		placeholder="Email address"
 		class="px-4 py-2 border border-gray-300 rounded-md"
 		required
-		bind:value={email}
+		name="email"
+		value={form?.email ?? ''}
 	/>
 	<input
 		type="password"
 		placeholder="Password"
 		class="px-4 py-2 border border-gray-300 rounded-md"
 		required
-		bind:value={password}
+		name="password"
 	/>
 
 	<br />
-	<button type="submit" class="default-action">Log In</button>
-
-	{#if !success && success !== undefined}
-		<div class="p-8 text-red-500 bg-red-100">There was an error logging in. Please try again.</div>
-	{/if}
+	<button class="default-action">Log In</button>
 </form>
