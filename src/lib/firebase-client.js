@@ -1,5 +1,5 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import firebase from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 import {
     PUBLIC_FIREBASE_API_KEY,
@@ -11,7 +11,6 @@ import {
 } from '$env/static/public';
 
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: PUBLIC_FIREBASE_API_KEY,
     authDomain: PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -21,16 +20,11 @@ const firebaseConfig = {
     appId: PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-let firebaseApp;
-
-if (!getApps().length) {
-    firebaseApp = initializeApp(firebaseConfig);
+if (!firebase.getApps().length) {
+    firebase.initializeApp(firebaseConfig);
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
 }
 
-  // Auth
-const firebaseAuth = getAuth(firebaseApp);
+const firebaseAuth = getAuth();
 
-const googleAuthProvider = new GoogleAuthProvider();
-
-export { firebaseApp, firebaseAuth, googleAuthProvider };
+export { firebase, firebaseAuth };

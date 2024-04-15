@@ -1,54 +1,32 @@
 <script>
-  import { goto } from '$app/navigation';
+	import { goto } from '$app/navigation';
+	let email;
+	let password;
 
-  import { createUserWithEmailAndPassword } from 'firebase/auth';
-  import { firebaseAuth } from '$lib/firebase';
-
-  let email;
-  let password;
-
-  let success = undefined;
-
-  const register = () => {
-    createUserWithEmailAndPassword(firebaseAuth, email, password)
-    .then((userCredentials) => {
-        console.log("registered",userCredentials);
-
-        goto('/login');
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-
-        success = false;
-      });
-  };
+	function create_account() {
+		console.log('Registering');
+	}
+	function cancel_create() {
+		console.log('Canceling registration');
+		goto('/');
+	}
 </script>
 
-<form
-  class="flex flex-col gap-4 p-8 space-y-4 bg-white sm:w-10/12"
-  on:submit|preventDefault={register}
->
-  <input
-    type="email"
-    placeholder="Email"
-    class="px-4 py-2 border border-gray-300 rounded-md"
-    required
-    bind:value={email}
-  />
-  <input
-    type="password"
-    placeholder="Password"
-    class="px-4 py-2 border border-gray-300 rounded-md"
-    required
-    bind:value={password}
-  />
+<input
+	bind:value={email}
+	type="email"
+	placeholder="Email address"
+	class="px-4 py-2 border border-gray-300 rounded-md"
+	required
+/>
+<input
+	bind:value={password}
+	type="password"
+	placeholder="Password"
+	class="px-4 py-2 border border-gray-300 rounded-md"
+	required
+/>
 
-  <button type="submit" class="default-action">Create Account</button>
-  <br/>
-
-	{#if !success && success !== undefined}
-		<div class="p-8 text-red-500 bg-red-100">There was an error creating your account. Please try again.</div>
-	{/if}
-</form>
+<br />
+<button on:click={create_account}>Create Account</button>
+<button on:click={cancel_create}>Cancel</button>
