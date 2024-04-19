@@ -1,5 +1,7 @@
+<main>
 <hr />
 <a href="/">Home</a>
+</main>
 
 <style>
 	a {
