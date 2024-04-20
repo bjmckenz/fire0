@@ -17,6 +17,7 @@ function createAuth() {
 
 					auth = getAuth(firebaseApp);
 
+					// calls set with the "auth" when state changes => updates the readable store
 					unsubscribe = onAuthStateChanged(auth, set);
 				} else {
 					// TODO: set auth on server from session (?)
@@ -32,6 +33,13 @@ function createAuth() {
 		const { signInWithRedirect, GoogleAuthProvider } = await import('firebase/auth');
 		console.log('sign_in');
 		await signInWithRedirect(auth, new GoogleAuthProvider());
+		console.log({
+			currentUser: auth.currentUser,
+			idToken:auth.currentUser.getIdToken()});
+		// auth().currentUser.getIdTokenResult()
+		// auth().setCustomUserClaims(uid, {admin: true})
+
+
 	}
 
 	async function sign_out() {
