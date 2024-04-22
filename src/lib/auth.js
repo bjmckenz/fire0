@@ -1,51 +1,84 @@
 // cribbed from https://www.captaincodeman.com/lazy-loading-firebase-with-sveltekit
+import { invalidateAll } from '$app/navigation';
 import { readable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 function createAuth() {
-    let auth;
+	let auth;
 
-    const { subscribe } =
-    readable(undefined,
-		(set) => {
-            let unsubscribe = () => {};
+	const { subscribe } = readable(undefined, (set) => {
+		let unsubscribe = () => {};
 
-			async function init() {
-                if (browser) {
-                    const { firebaseApp } = await import('$lib/firebase-app');
-                    const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+		async function init() {
+			if (browser) {
+				const { firebaseClientApp } = await import('$lib/firebase-client');
+				const { getAuth, onAuthStateChanged } = await import('firebase/auth');
 
-					auth = getAuth(firebaseApp);
+				auth = getAuth(firebaseClientApp);
 
-					// calls set with the "auth" when state changes => updates the readable store
-					unsubscribe = onAuthStateChanged(auth, set);
-				} else {
-					// TODO: set auth on server from session (?)
-				}
+				// calls set with the "auth" when state changes => updates the readable store
+				unsubscribe = onAuthStateChanged(auth, set);
+			} else {
+// 				const { firebaseServerApp, serverAuth } = await import('$lib/firebase-server');
+// console.log({firebaseServerApp});
+// 				serverAuth()
+// 					.currentUser.getIdToken(/* forceRefresh */ true)
+// 					.then((idToken) =>
+// 						fetch('/api/sessionLogin', {
+// 							body: JSON.stringify({ idToken }),
+// 							method: 'POST',
+// 							'content-type': 'application/json'
+// 						})
+// 					);
 			}
+		}
 
-			init();
+		init();
 
-			return unsubscribe;
-		});
+		return unsubscribe;
+	});
 
 	async function sign_in() {
-		const { signInWithRedirect, GoogleAuthProvider } = await import('firebase/auth');
+		const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
 		console.log('sign_in');
-		await signInWithRedirect(auth, new GoogleAuthProvider());
+		await signInWithPopup(auth, new GoogleAuthProvider());
+
+		const csrfToken = '?'; //cookies.get('csrfToken')
+
+		const idToken = await auth.currentUser.getIdToken();
 		console.log({
 			currentUser: auth.currentUser,
-			idToken:auth.currentUser.getIdToken()});
-		// auth().currentUser.getIdTokenResult()
-		// auth().setCustomUserClaims(uid, {admin: true})
+			idToken,
+			csrfToken,
+		});
 
-
+		// exchange idToken for session cookie
+		await fetch('/api/sessionLogin', {
+			body: JSON.stringify({ idToken, csrfToken }),
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+		auth.currentUser.getIdToken(true);
+		invalidateAll();
 	}
 
 	async function sign_out() {
 		const { signOut } = await import('firebase/auth');
 		console.log('sign_out');
 		await signOut(auth);
+
+		const csrfToken = '?'; //cookies.get('csrfToken')
+
+		await fetch('/api/sessionLogout', {
+			body: JSON.stringify({ csrfToken }),
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+		invalidateAll();
 	}
 
 	return {

@@ -19,6 +19,6 @@ const firebaseConfig = {
 	appId: PUBLIC_FIREBASE_APP_ID
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+const firebaseClientApp = initializeApp(firebaseConfig);
 
-export { firebaseApp };
+export { firebaseClientApp };
