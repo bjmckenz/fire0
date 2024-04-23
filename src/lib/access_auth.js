@@ -39,9 +39,9 @@ export const session_auth_data = async (sessionCookie) => {
                 true /** checkRevoked */)
 		: {};
 
-    // these are the bits of firebase auth we expose.. sub == uid
-	const claim_keys = ['name', 'picture', 'sub', 'email', 'email_verified'];
-	const user_auth_data = {};
+    // these are the bits of firebase auth we expose.
+	const claim_keys = ['name', 'picture', 'email', 'email_verified'];
+	const user_auth_data = { uid: allClaims.sub };
 	Object.keys(allClaims).forEach((key) => {
 		if (claim_keys.includes(key) || key.startsWith('approle_')) {
 			user_auth_data[key.replace('approle_', '')] = allClaims[key];

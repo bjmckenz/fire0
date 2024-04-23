@@ -19,6 +19,7 @@ export async function POST({ request, cookies }) {
 		sessionCookie,
 		true /** checkRevoked */
 	);
+	// "sub" is the offial uid in firebase auth
 	await getAuth().revokeRefreshTokens(claims.sub);
 
 	return json({ message: 'success' });
