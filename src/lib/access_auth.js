@@ -31,16 +31,23 @@ export const grantAccess = (auth_data, url) => {
 };
 
 export const session_auth_data = async (sessionCookie) => {
-    if (!sessionCookie) {
-        return {};
-    }
+	if (!sessionCookie) {
+		return {};
+	}
 	const allClaims = sessionCookie
-		? await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie,
-                true /** checkRevoked */)
+		? await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie, true /** checkRevoked */)
 		: {};
 
-    // these are the bits of firebase auth we expose. (plus our claims)
-	const claim_keys = ['name', 'picture', 'email', 'email_verified'];
+	// these are the bits of firebase auth we expose. (plus our claims)
+	const claim_keys = [
+		'name',
+		'picture',
+		'email',
+		'email_verified',
+		'disabled',
+		'phoneNumber',
+		'displayName'
+	];
 	const user_auth_data = { uid: allClaims.sub };
 	Object.keys(allClaims).forEach((key) => {
 		if (claim_keys.includes(key) || key.startsWith('approle_')) {
