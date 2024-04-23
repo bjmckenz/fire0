@@ -6,22 +6,22 @@ export async function POST({ request, cookies }) {
 
 	const claims = await serverAuth.verifyIdToken(idToken);
 
-	console.log('received in POST to /sessionLogin:', {
-		idTokenInRequest: idToken,
-		sessionCookie: cookies.get('session'),
-		csrfTokenInCookie: cookies.get('csrfToken'),
-		csrfTokenInRequest: csrfToken,
-		claims: claims ?? 'none'
-	});
+	// console.log('received in POST to /sessionLogin:', {
+	// 	idTokenInRequest: idToken,
+	// 	sessionCookie: cookies.get('session'),
+	// 	csrfTokenInCookie: cookies.get('csrfToken'),
+	// 	csrfTokenInRequest: csrfToken,
+	// 	claims: claims ?? 'none'
+	// });
 
 	const aUser = await serverAuth.getUserByEmail('bjmckenz@gmail.com');
 	let userCustomClaims = aUser.customClaims ?? {};
-	if (!userCustomClaims['admin']) {
-		console.log('setting admin claim for user',aUser.uid);
-		userCustomClaims['admin'] = true;
+	if (!userCustomClaims['approle_admin']) {
+		// console.log('setting approle_admin claim for user',aUser.uid);
+		userCustomClaims['approle_admin'] = true;
 		serverAuth.setCustomUserClaims(aUser.uid, userCustomClaims);
 	} else {
-		console.log('user ',aUser.uid,' already has admin claim');
+		// console.log('user ',aUser.uid,' already has admin claim (approle_admin)');
 	}
 
 	// Guard against CSRF attacks.
@@ -37,7 +37,7 @@ export async function POST({ request, cookies }) {
 	const options = { maxAge: expiresIn, httpOnly: true, secure: true, path: '/' };
 	cookies.set('session', sessionCookie, options);
 
-	console.log('new session cookie', { sessionCookie, options });
+	// console.log('new session cookie', { sessionCookie, options });
 
 	// 	(error) => {
 	// 		return json({ message: 'UNAUTHORIZED REQUEST', error }, { status: 401 });

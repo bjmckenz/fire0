@@ -8,12 +8,18 @@
 <p>Currently implemented: email/password</p>
 
 <p>Go to page that is publicly available.</p>
-<button on:click={() => {goto('/public')}}>No Auth Required</button>
+<button on:click={() => {goto('/public')}}>/public</button>
 
 <p>Go to page that is available only to logged-in users (or Admin users).</p>
-<button on:click={() => {goto('/onlyUser')}}>Auth Required</button>
+<button on:click={() => {goto('/product')}}>/product</button>
+
+<p>Go to page that is available only to logged-in users.</p>
+<button on:click={() => {goto('/user/profile')}}>/user/profile</button>
+
+<p>Go to page that is available only to useradmin users.</p>
+<button on:click={() => {goto('/useradmin')}}>/useradmin</button>
 
 <p>Go to page that is available only to logged-in SUPER users.</p>
-<button on:click={() => {goto('/onlyAdmin')}}>Auth as Admin Required</button>
+<button on:click={() => {goto('/admin')}}>/admin</button>
 
 

@@ -40,17 +40,17 @@ function createAuth() {
 
 	async function sign_in() {
 		const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
-		console.log('sign_in');
+		//console.log('sign_in');
 		await signInWithPopup(auth, new GoogleAuthProvider());
 
 		const csrfToken = '?'; //cookies.get('csrfToken')
 
 		const idToken = await auth.currentUser.getIdToken();
-		console.log({
-			currentUser: auth.currentUser,
-			idToken,
-			csrfToken,
-		});
+		// console.log({
+		// 	currentUser: auth.currentUser,
+		// 	idToken,
+		// 	csrfToken,
+		// });
 
 		// exchange idToken for session cookie
 		await fetch('/api/sessionLogin', {
@@ -66,7 +66,7 @@ function createAuth() {
 
 	async function sign_out() {
 		const { signOut } = await import('firebase/auth');
-		console.log('sign_out');
+		// console.log('sign_out');
 		await signOut(auth);
 
 		const csrfToken = '?'; //cookies.get('csrfToken')

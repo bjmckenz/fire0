@@ -1,21 +1,10 @@
-import { firebaseServerApp } from '$lib/firebase-server';
-import { getAuth } from 'firebase-admin/auth';
+import { grantAccess, session_auth_data } from '../lib/access_auth';
 
-export const load = async ({ cookies }) => {
-	const sessionCookie = cookies.get('session') || '';
-
-	if (!sessionCookie) {
-		return { claims: {} };
-	}
-
-	const claims = await getAuth(firebaseServerApp).verifySessionCookie(
-		sessionCookie,
-		true /** checkRevoked */
-	);
-
-	console.log('layout.server',{ claims });
+export const load = async ({ cookies, url }) => {
+	const auth_data = await session_auth_data( cookies.get('session') );
 
 	return {
-		claims
+		auth_data,
+		grant_access: grantAccess(auth_data, url)
 	};
 };
