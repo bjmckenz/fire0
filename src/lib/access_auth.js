@@ -15,9 +15,9 @@ path to be protected by multiple roles.
 
 // preconstructed regexes for faster matching
 const path_to_role_map = new Map([
-	[new RegExp(/^[/]]admin([/]]|$)/), SUPERUSER_ROLE],
-	[new RegExp(/^[/]]user([/]]|$)/), 'user'],
-	[new RegExp(/^[/]]useradmin([/]]|$)/), 'useradmin']
+	[new RegExp(/^[/]admin([/]|$)/), SUPERUSER_ROLE],
+	[new RegExp(/^[/]user([/]|$)/), 'user'],
+	[new RegExp(/^[/]useradmin([/]|$)/), 'useradmin']
 ]);
 
 export const grantAccess = (auth_data, url) => {
@@ -39,7 +39,7 @@ export const session_auth_data = async (sessionCookie) => {
                 true /** checkRevoked */)
 		: {};
 
-    // these are the bits of firebase auth we expose.
+    // these are the bits of firebase auth we expose. (plus our claims)
 	const claim_keys = ['name', 'picture', 'email', 'email_verified'];
 	const user_auth_data = { uid: allClaims.sub };
 	Object.keys(allClaims).forEach((key) => {
