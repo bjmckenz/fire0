@@ -24,7 +24,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"cookie": "^0.6.0",
 		"firebase": "^10.10.0",
 		"firebase-admin": "^12.0.0"
 	}
