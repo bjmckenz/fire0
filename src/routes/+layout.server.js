@@ -1,10 +1,10 @@
-import { grantAccess, session_auth_data } from '../lib/access_auth';
+import { user_can_access_url, user_data_from_session } from '../lib/access_auth';
 
 export const load = async ({ cookies, url }) => {
-	const auth_data = await session_auth_data( cookies.get('session') );
+	const user_record = await user_data_from_session( cookies.get('session') );
 
 	return {
-		auth_data,
-		grant_access: grantAccess(auth_data, url)
+		user_record,
+		grant_access: user_can_access_url(user_record, url)
 	};
 };

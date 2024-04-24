@@ -20,17 +20,49 @@ const path_to_role_map = new Map([
 	[new RegExp(/^[/]useradmin([/]|$)/), 'useradmin']
 ]);
 
-export const grantAccess = (auth_data, url) => {
-	if (SUPERUSER_ROLE in auth_data) {
+export const user_can_access_url = (user_record, url) => {
+	// URLs can be public, and there may not be a logged-in user
+	let user_supplied = user_record && Object.keys(user_record).length !== 0;
+
+	if (user_supplied && user_record.roles.includes(SUPERUSER_ROLE)) {
+		//console.log('superuser', { user_record, url });
 		return true;
 	}
+
 	const [stem] = [...path_to_role_map.keys()].filter((aStem) => aStem.test(url.pathname));
-	const result = !stem || path_to_role_map.get(stem) in auth_data;
-	// console.log('post-test', { auth_data, stem, url, result });
+	const result = !stem || (user_supplied && path_to_role_map.get(stem) in user_record.roles);
+	//console.log('post-test', JSON.stringify({ user_supplied, user_record, stem, url, result }, null, 2));
 	return result;
 };
 
-export const session_auth_data = async (sessionCookie) => {
+const keys_to_copy = [
+	'uid',
+	'email',
+	'disabled',
+	'emailVerified',
+	'displayName',
+	'photoURL',
+	'phoneNumber'
+];
+
+// return a "us" user object for a Firebase UserRecord
+export const userForUserRecord = (userRecord) => {
+	const user = {
+		roles: []
+	};
+	keys_to_copy.map((key) => {user[key] = userRecord[key] ?? undefined });
+
+	if (userRecord.customClaims) {
+		Object.keys(userRecord.customClaims).forEach((key) => {
+			if (key.startsWith('approle_')) {
+				user.roles.push( key.replace('approle_', '') );
+			}
+		});
+	}
+	return user;
+};
+
+export const user_data_from_session = async (sessionCookie) => {
 	if (!sessionCookie) {
 		return {};
 	}
@@ -38,24 +70,11 @@ export const session_auth_data = async (sessionCookie) => {
 		? await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie, true /** checkRevoked */)
 		: {};
 
-	// these are the bits of firebase auth we expose. (plus our claims)
-	const claim_keys = [
-		'name',
-		'picture',
-		'email',
-		'email_verified',
-		'disabled',
-		'phoneNumber',
-		'displayName'
-	];
-	const user_auth_data = { uid: allClaims.sub };
-	Object.keys(allClaims).forEach((key) => {
-		if (claim_keys.includes(key) || key.startsWith('approle_')) {
-			user_auth_data[key.replace('approle_', '')] = allClaims[key];
-		}
-	});
+	const userRec = await getAuth(firebaseServerApp).getUser(allClaims.sub);
 
-	console.log('session_auth_data', { user_auth_data });
+	const user = userForUserRecord(userRec);
 
-	return user_auth_data;
+	//console.log('user_data_from_session', { user, allClaims, userRec });
+
+	return user;
 };
