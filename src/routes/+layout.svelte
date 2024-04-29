@@ -8,7 +8,6 @@
 
 <PageHeader />
 
-<!-- <pre>{JSON.stringify(data.user_record,null,2)}</pre> -->
 {#if data.grant_access}
 	<slot />
 {:else}
@@ -16,3 +15,4 @@
 {/if}
 
 <PageFooter />
+<pre> {JSON.stringify(data,null,2)} </pre>

@@ -1,10 +1,10 @@
 
 <!-- COURTESY OF https://codepen.io/aimieisanxious/pen/zJepap -->
-
+<main>
 <div class="maincontainer">
 	<div class="bat">
 		<img
-			class="wing leftwing"
+			class="wing leftwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 		<img
@@ -13,13 +13,13 @@
 			alt="bat"
 		/>
 		<img
-			class="wing rightwing"
+			class="wing rightwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 	</div>
 	<div class="bat">
 		<img
-			class="wing leftwing"
+			class="wing leftwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 		<img
@@ -28,13 +28,13 @@
 			alt="bat"
 		/>
 		<img
-			class="wing rightwing"
+			class="wing rightwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 	</div>
 	<div class="bat">
 		<img
-			class="wing leftwing"
+			class="wing leftwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 		<img
@@ -43,7 +43,7 @@
 			alt="bat"
 		/>
 		<img
-			class="wing rightwing"
+			class="wing rightwing" alt
 			src="https://aimieclouse.com/Media/Portfolio/Error403Forbidden/bat-wing.png"
 		/>
 	</div>
@@ -55,9 +55,10 @@
 </div>
 <h1 class="errorcode">ERROR 403</h1>
 <div class="errortext">This area is forbidden. Turn back now!</div>
+</main>
 
 <style>
-	html {
+	main {
 		background-color: #000121;
 		font-family: 'Roboto', sans-serif;
 	}
