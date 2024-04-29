@@ -1,11 +1,13 @@
 import { json } from '@sveltejs/kit';
 import { serverAuth } from '$lib/firebase-server';
-import { SUPERUSER_ROLE } from '$env/static/private';
+import { user_logged_in } from '$lib/account_processing';
 
 export async function POST({ request, cookies }) {
 	const { idToken, csrfToken } = await request.json();
 
 	const claims = await serverAuth.verifyIdToken(idToken);
+
+	await user_logged_in(claims);
 
 	// console.log('received in POST to /sessionLogin:', {
 	// 	idTokenInRequest: idToken,
@@ -14,19 +16,6 @@ export async function POST({ request, cookies }) {
 	// 	csrfTokenInRequest: csrfToken,
 	// 	claims: claims ?? 'none'
 	// });
-
-	// How to make yourself an admin the first time you log in?
-	// uncomment this and add your email address. Then run. Then comment out again.
-	// const aUser = await serverAuth.getUserByEmail('YOUR_EMAIL_HERE');
-	// let userCustomClaims = aUser.customClaims ?? {};
-	// if (!userCustomClaims['approle_'+SUPERUSER_ROLE]) {
-	// 	userCustomClaims['approle_'+SUPERUSER_ROL] = true;
-	// 	serverAuth.setCustomUserClaims(aUser.uid, userCustomClaims);
-	// 	console.log("Adding "+SUPERUSER_ROLE+" role to "+aUser.email);
-	// }
-
-	// This is the place you would add a default role, such as "user" to new users.
-	// Otherwise you'll have to add roles manually via /useradmin/manageUserRoles
 
 	// Guard against CSRF attacks.
 	// if (csrfToken !== cookies.get('csrfToken') {

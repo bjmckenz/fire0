@@ -18,18 +18,6 @@ function createAuth() {
 
 				// calls set with the "auth" when state changes => updates the readable store
 				unsubscribe = onAuthStateChanged(auth, set);
-			} else {
-// 				const { firebaseServerApp, serverAuth } = await import('$lib/firebase-server');
-// console.log({firebaseServerApp});
-// 				serverAuth()
-// 					.currentUser.getIdToken(/* forceRefresh */ true)
-// 					.then((idToken) =>
-// 						fetch('/api/sessionLogin', {
-// 							body: JSON.stringify({ idToken }),
-// 							method: 'POST',
-// 							'content-type': 'application/json'
-// 						})
-// 					);
 			}
 		}
 
@@ -40,7 +28,6 @@ function createAuth() {
 
 	async function sign_in() {
 		const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
-		//console.log('sign_in');
 		await signInWithPopup(auth, new GoogleAuthProvider());
 
 		const csrfToken = '?'; //cookies.get('csrfToken')
@@ -60,16 +47,16 @@ function createAuth() {
 				'Content-Type': 'application/json'
 			}
 		})
+		// deletes the one we got because we now use a server session cookie
 		auth.currentUser.getIdToken(true);
 		invalidateAll();
 	}
 
 	async function sign_out() {
-		const { signOut } = await import('firebase/auth');
-		// console.log('sign_out');
-		await signOut(auth);
-
 		const csrfToken = '?'; //cookies.get('csrfToken')
+		const { signOut } = await import('firebase/auth');
+
+		await signOut(auth);
 
 		await fetch('/api/sessionLogout', {
 			body: JSON.stringify({ csrfToken }),

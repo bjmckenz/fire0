@@ -1,0 +1,30 @@
+title Client Side of Signin Flow
+
+actor User
+participant Client
+participant sign_in
+participant FB
+participant API
+
+User->Client: (Clicks Sign In)
+
+Client->sign_in:
+sign_in->FB: signInWithPopup
+note over FB: (updates\nauth state)
+FB->sign_in:
+sign_in->FB: currentUser.\ngetIdToken
+FB->sign_in: idToken1
+
+sign_in->API: POST idToken1 to \n/api/sessionLogin
+note over API: (See this flow)
+note over API: (session cookie\nset)
+API->sign_in: (200 OK)
+
+sign_in->FB: currentUser.\ngetIdToken:
+note over FB: (invalidates\nidToken1)
+FB->sign_in: idToken2
+note over sign_in: invalidateAll()
+sign_in->Client:
+note over Client: (redraws everything \nbecause it was all \ninvalidated)
+Client->User:
+note over User: Sees everything\nthey should

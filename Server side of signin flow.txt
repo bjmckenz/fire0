@@ -1,0 +1,41 @@
+# paste me into websequencediagrams.com
+title Server side of Signin Flow
+
+participant Client
+participant POST
+participant cookies
+participant user_logged_in
+participant FBA
+
+Client->POST: idToken1
+
+POST->FBA: verifyIdToken
+FBA->POST: user claims
+
+POST->user_logged_in: user_logged_in
+
+opt application userid NOT present in claims
+
+note over user_logged_in: create user;\ndetermine if first user?\nYOU WRITE THIS
+
+note over user_logged_in: add app user id as claim
+note over user_logged_in: add user claim
+
+opt is first user?
+note over user_logged_in: add SUPERUSER role claim
+end
+
+user_logged_in->FBA: setCustomUserClaims
+FBA->user_logged_in:
+
+end
+
+user_logged_in->POST:
+
+POST->FBA: createSessionCookie
+FBA->POST: sessionCookie
+
+
+POST->cookies: set "session" to\nsessionCookie
+
+POST->Client: 200 OK\n(cookie set)

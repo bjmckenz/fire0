@@ -74,7 +74,7 @@ export const user_data_from_session = async (sessionCookie) => {
 
 	const user = userForUserRecord(userRec);
 
-	//console.log('user_data_from_session', { user, allClaims, userRec });
+	console.log('user_data_from_session', { user, allClaims, userRec });
 
 	return user;
 };
