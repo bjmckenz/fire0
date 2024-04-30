@@ -1,4 +1,4 @@
-import { firebaseServerApp } from '$lib/firebase-server';
+import { firebaseServerApp } from '$lib/server/firebaseServerApp';
 import { getAuth } from 'firebase-admin/auth';
 import { sanitized } from '$lib/sanitized_user_record';
 

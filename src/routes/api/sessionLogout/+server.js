@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { firebaseServerApp } from '$lib/firebase-server';
+import { firebaseServerApp } from '$lib/server/firebaseServerApp';
 import { getAuth } from 'firebase-admin/auth';
 
 export async function POST({ request, cookies }) {

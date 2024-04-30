@@ -1,5 +1,5 @@
 <script>
-	import { userRoles } from '$lib/get_roles_from_user';
+	import { roles_from_user } from '$lib/roles_from_user';
 	export let data;
 </script>
 
@@ -37,7 +37,7 @@
 						{#if u.emailVerified}(verified){/if}{/if}</td
 				>
 				<td
-					>{#if userRoles(u)}{#each userRoles(u) as r}{r}&nbsp;{/each}{/if}</td
+					>{#if roles_from_user(u)}{#each roles_from_user(u) as r}{r}&nbsp;{/each}{/if}</td
 				>
 				<td
 					>{#if u.disabled}disabled{/if}</td

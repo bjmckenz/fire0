@@ -13,7 +13,7 @@
 <p>Go to page that is available only to logged-in users (or Admin users).</p>
 <button on:click={() => {goto('/product')}}>/product</button>
 
-<p>Go to page that is available only to logged-in users.</p>
+<p>Go to user profile which is available only to logged-in users.</p>
 <button on:click={() => {goto('/user/profile')}}>/user/profile</button>
 
 <p>Go to page that is available only to useradmin users.</p>

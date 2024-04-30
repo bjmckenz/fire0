@@ -1,5 +1,5 @@
 
-export const userRoles = (userRec) => {
+export const roles_from_user = (userRec) => {
 	if ( !userRec || !userRec.customClaims ) {
 		return [];
 	}

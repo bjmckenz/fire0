@@ -10,14 +10,13 @@ A framework you can add to an existing Svelte project and get page-level protect
 
 It comes with two roles (user, admin) out of the box
 
-Grants are based on the route URL. See ```src/lib/access_auth.js``` for config. (In other words you can protect routes starting with "/")
+Grants are based on the route URL. See ```src/lib/server/user_can_access_url.js``` for config. (In other words you can protect routes starting with "/")
 
-It comes with four protected routes (/admin, /user, /useradmin). Note that /useradmin is protected by a role "useradmin" that doesn't [exist or] need to be granted because "admin" has access to all routes (superuser mode)
+It comes with three protected routes (/admin, /user, /useradmin). Note that /useradmin is protected by a role "useradmin" that doesn't [exist or] need to be granted because "admin" has access to all routes (superuser mode)
 
 If you want users to have access to "user" things immediately after creating an account, you must grant them the user role in ```src/routes/api/sessionLogin.js/POST```.
 
 (You must also grant yourself the admin role; see note in same place)
-
 
 ***You are not obligated to keep the default roles or routes. They are all configurable.***
 
@@ -37,9 +36,9 @@ That's all!
 * clone it
 * create your ```.env``` file *(below)*
 * ```npm install```
-* modify ```src/lib/access_auth.js``` to grant yourself "admin" **then remove this later**
+* modify ```src/lib/server/user_can_access_url.js``` to grant yourself "admin" **then remove this later**
 * ```npm run dev```
-* modify ```src/lib/access_auth.js``` to protect paths, moving routes as necessary
+* modify ```src/lib/server/user_can_access_url.js``` to protect paths, moving routes as necessary
 
 # .env
 
@@ -61,6 +60,7 @@ Create a file ```.env``` at the project root with all of those ***and the follow
 ```
 NODE_ENV=development
 SUPERUSER_ROLE=admin
+NEW_USER_ROLE=user
 ```
 
 This are your development params.

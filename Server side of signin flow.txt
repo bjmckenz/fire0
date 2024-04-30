@@ -4,7 +4,7 @@ title Server side of Signin Flow
 participant Client
 participant POST
 participant cookies
-participant user_logged_in
+participant handle_user_logging_in
 participant FBA
 
 Client->POST: idToken1
@@ -12,25 +12,25 @@ Client->POST: idToken1
 POST->FBA: verifyIdToken
 FBA->POST: user claims
 
-POST->user_logged_in: user_logged_in
+POST->handle_user_logging_in: handle_user_logging_in
 
 opt application userid NOT present in claims
 
-note over user_logged_in: create user;\ndetermine if first user?\nYOU WRITE THIS
+note over handle_user_logging_in: create user;\ndetermine if first user?\nYOU WRITE THIS
 
-note over user_logged_in: add app user id as claim
-note over user_logged_in: add user claim
+note over handle_user_logging_in: add app user id as claim
+note over handle_user_logging_in: add user claim
 
 opt is first user?
-note over user_logged_in: add SUPERUSER role claim
+note over handle_user_logging_in: add SUPERUSER role claim
 end
 
-user_logged_in->FBA: setCustomUserClaims
-FBA->user_logged_in:
+handle_user_logging_in->FBA: setCustomUserClaims
+FBA->handle_user_logging_in:
 
 end
 
-user_logged_in->POST:
+handle_user_logging_in->POST:
 
 POST->FBA: createSessionCookie
 FBA->POST: sessionCookie

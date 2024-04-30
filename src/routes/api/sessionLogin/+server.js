@@ -1,13 +1,13 @@
 import { json } from '@sveltejs/kit';
-import { serverAuth } from '$lib/firebase-server';
-import { user_logged_in } from '$lib/account_processing';
+import { serverAuth } from '$lib/server/firebaseServerApp';
+import { handle_user_logging_in } from '$lib/server/handle_user_logging_in';
 
 export async function POST({ request, cookies }) {
 	const { idToken, csrfToken } = await request.json();
 
 	const claims = await serverAuth.verifyIdToken(idToken);
 
-	await user_logged_in(claims);
+	await handle_user_logging_in(claims);
 
 	// console.log('received in POST to /sessionLogin:', {
 	// 	idTokenInRequest: idToken,

@@ -1,6 +1,6 @@
-import { firebaseServerApp } from '$lib/firebase-server';
+import { firebaseServerApp } from '$lib/server/firebaseServerApp';
 import { getAuth } from 'firebase-admin/auth';
-import { userRoles } from '$lib/get_roles_from_user';
+import { roles_from_user } from '$lib/roles_from_user';
 
 export const actions = {
 	execute: async ({ request }) => {
@@ -37,7 +37,7 @@ export const actions = {
 		console.log('aUser', {aUser});
 
 		if (action == 'check') {
-			const claims = userRoles(aUser);
+			const claims = roles_from_user(aUser);
 			response.message = `User ${email} has roles: ${claims.join(', ')}`;
 			return response;
 		}
