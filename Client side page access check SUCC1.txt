@@ -1,0 +1,36 @@
+title Client-Side page access check (logged in -> /user)
+
+actor User
+participant client
+participant layout.svelte
+participant layout.server.js
+participant user_data_from_session
+participant user_can_access_url
+participant FBA
+
+User->client: GET /user\n{a protected page}
+
+client->layout.svelte: URL
+
+layout.svelte->layout.server.js: load()
+
+note over layout.server.js: get cookie "session"
+
+layout.server.js->user_data_from_session: sessionCookie
+
+user_data_from_session->FBA: verify sessionCookie
+FBA->user_data_from_session: all access claims\nfor cookie's user
+user_data_from_session->FBA: getUser( allClaims.uid )
+FBA->user_data_from_session: UserRec
+note over user_data_from_session: sanitize
+user_data_from_session->layout.server.js: user_record
+
+layout.server.js->user_can_access_url:  user_record, URL
+note over user_can_access_url: after\ncareful\nconsideration
+user_can_access_url->layout.server.js: grant_access: false
+
+layout.server.js->layout.svelte: data = \n{ user_record: {},\n  grant_access: false }
+note over layout.svelte: <slot/> rendered
+
+layout.svelte->client: /user page
+client->User: /user

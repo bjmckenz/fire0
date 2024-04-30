@@ -16,8 +16,8 @@ note over layout.server.js: get cookie "session"
 layout.server.js->user_data_from_session: (empty sessionCookie)
 user_data_from_session->layout.server.js: empty user_data\nsince not logged in
 
-layout.server.js->user_can_access_url: user_record, URL
-note overuser_can_access_url: after\ncareful\nconsideration
+layout.server.js->user_can_access_url: NUll user_record, URL
+note over user_can_access_url: after\ncareful\nconsideration
 user_can_access_url->layout.server.js: grant_access: false
 
 layout.server.js->layout.svelte: data = { user_record: {}, grant_access: false }
