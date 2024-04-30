@@ -1,16 +1,16 @@
 import { firebaseServerApp } from '$lib/firebase-server';
 import { getAuth } from 'firebase-admin/auth';
-import { userForUserRecord } from '$lib/access_auth';
+import { sanitized } from '$lib/sanitized_user_record';
 
 export const load = async () => {
-	let listOfUsers;
+	let users;
 	try {
-		listOfUsers = await getAuth(firebaseServerApp).listUsers(1000, undefined);
+		// recs come from FB with non-seriazable fields
+		const { users: userRecs } = await getAuth(firebaseServerApp).listUsers(1000, undefined);
+		users = userRecs.map((ur) => sanitized(ur));
 	} catch (error) {
 		return { error: 'Cannot list users: ' + error, users: [] };
 	}
-
-	const users = listOfUsers.users.map((userRec) => userForUserRecord(userRec));
 
 	return { users };
 };

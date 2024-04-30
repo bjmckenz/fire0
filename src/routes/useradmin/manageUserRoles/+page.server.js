@@ -1,5 +1,6 @@
 import { firebaseServerApp } from '$lib/firebase-server';
 import { getAuth } from 'firebase-admin/auth';
+import { userRoles } from '$lib/get_roles_from_user';
 
 export const actions = {
 	execute: async ({ request }) => {
@@ -36,9 +37,7 @@ export const actions = {
 		console.log('aUser', {aUser});
 
 		if (action == 'check') {
-			const claims = Object.keys(aUser.customClaims??{})
-				.filter((key) => key.startsWith('approle_'))
-				.map((key) => key.replace('approle_', ''));
+			const claims = userRoles(aUser);
 			response.message = `User ${email} has roles: ${claims.join(', ')}`;
 			return response;
 		}

@@ -13,12 +13,15 @@ layout.svelte->layout.server.js: load()
 
 note over layout.server.js: get cookie "session"
 
-layout.server.js->user_data_from_session: sessionCookie
-user_data_from_session->layout.server.js: user_record\n(may be empty)
+layout.server.js->user_data_from_session: (empty sessionCookie)
+user_data_from_session->layout.server.js: empty user_data\nsince not logged in
+
 layout.server.js->user_can_access_url: user_record, URL
 note overuser_can_access_url: after\ncareful\nconsideration
 user_can_access_url->layout.server.js: grant_access: false
+
 layout.server.js->layout.svelte: data = { user_record: {}, grant_access: false }
 note over layout.svelte: No <slot/> rendered,\nForbidden rendered instead
+
 layout.svelte->client: Forbidden page
 client->User: Forbidden page
