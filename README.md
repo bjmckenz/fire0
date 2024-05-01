@@ -14,9 +14,9 @@ Grants are based on the route URL. See ```src/lib/server/user_can_access_url.js`
 
 It comes with three protected routes (/admin, /user, /useradmin). Note that /useradmin is protected by a role "useradmin" that doesn't [exist or] need to be granted because "admin" has access to all routes (superuser mode)
 
-If you want users to have access to "user" things immediately after creating an account, you must grant them the user role in ```src/routes/api/sessionLogin.js/POST```.
+All users are granted the "NEW_USER_ROLE" (from ```.env```) at first login.
 
-(You must also grant yourself the admin role; see note in same place)
+The first user to log in is granted "SUPERUSER_ROLE" (from ```.env```), making them an admin
 
 ***You are not obligated to keep the default roles or routes. They are all configurable.***
 
@@ -36,13 +36,14 @@ That's all!
 * clone it
 * create your ```.env``` file *(below)*
 * ```npm install```
-* modify ```src/lib/server/user_can_access_url.js``` to grant yourself "admin" **then remove this later**
-* ```npm run dev```
+* modify ```src/lib/server/handle_user_logging_in.js``` with your database specifics (tables, columns) in all three places.
 * modify ```src/lib/server/user_can_access_url.js``` to protect paths, moving routes as necessary
+* See ```src/routes/user/profile/+page.js``` to see how you access the logged-in user's id.
+* ```npm run dev```
 
 # .env
 
-Your Firebase config goes in this file. Set up a Firebase project, and eventually it'll give you these params:
+Your Firebase config goes in this file. Set up a Firebase project, add/enable authentication, and eventually it'll give you these params:
 
 ```
 PUBLIC_FIREBASE_API_KEY=BLAHBLAHBLAH
@@ -74,8 +75,6 @@ Oh yeah.
 * Redirect is going to stop working in a few months
 * Passing "granted" to layout.svelte is not secure (since layout.svelte is client-side)
 * Only doing Google auth right (signinRedirect). You'll have to modify if you want other providers.
-* initial user/admin is lame
-* Should fix the "grant a role by default on new user", at least as sample code
 * notion of "user" role seems like it means "can log in" but it's not. It's just a role.
 * I like [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en). Should add that everywhere.
 
