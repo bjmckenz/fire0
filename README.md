@@ -70,13 +70,11 @@ This are your development params.
 
 # Limitations
 
-Oh yeah.
-
-* Redirect is going to stop working in a few months
-* Passing "granted" to layout.svelte is not secure (since layout.svelte is client-side)
-* Only doing Google auth right (signinRedirect). You'll have to modify if you want other providers.
 * notion of "user" role seems like it means "can log in" but it's not. It's just a role.
 * I like [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en). Should add that everywhere.
+
+# BUGS? ISSUES?
+* Please add them to Github issues for this project.
 
 # Most Useful Links
 
