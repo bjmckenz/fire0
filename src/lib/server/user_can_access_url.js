@@ -16,6 +16,7 @@ path to be protected by multiple roles.
 const path_to_role_map = new Map([
 	[new RegExp(/^[/]admin([/]|$)/), SUPERUSER_ROLE],
 	[new RegExp(/^[/]user([/]|$)/), 'user'],
+	[new RegExp(/^[/]product([/]|$)/), 'user'],
 	[new RegExp(/^[/]useradmin([/]|$)/), 'useradmin']
 ]);
 
@@ -32,7 +33,7 @@ export const user_can_access_url = (user_record, url) => {
 
 	const [stem] = [...path_to_role_map.keys()].filter((aStem) => aStem.test(url.pathname));
 	const result = !stem || (user_supplied &&
-				path_to_role_map.get(stem) in roles);
+				roles.includes(path_to_role_map.get(stem)));
 	//console.log('post-test', JSON.stringify({ user_supplied, user_record, stem, url, result }, null, 2));
 	return result;
 };

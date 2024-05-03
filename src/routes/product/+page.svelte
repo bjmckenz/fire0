@@ -1,7 +1,5 @@
 <main>
-  <h1>This page should viewable by the public
-  </h1>
-<h2>and logged-in people</h2>
+  <h1>This page should viewable by logged-in users only</h1>
 </main>
 
 <style>
