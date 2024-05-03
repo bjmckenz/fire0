@@ -85,6 +85,9 @@ function createAuth() {
 			}
 		})
 		invalidateAll();
+		if (browser) {
+			window.location = '/';
+		}
 	}
 
 	return {
