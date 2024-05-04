@@ -1,100 +1,104 @@
-import {database_handle} from '$lib/server/database';
-
 import { serverAuth } from '$lib/server/firebaseServerApp';
 
 // SUPERUSER_ROLE: this role name has access to ALL routes
-import { SUPERUSER_ROLE, NEW_USER_ROLE } from '$env/static/private';
+import { SUPERUSER_ROLE, NEW_USER_ROLE, DEBUG_AUTH } from '$env/static/private';
 
+
+// YOU MUST CONFIGURE: table names, column names IN THESE THREE ROUTINES
+// vvvvvvvvv
+import {database_handle} from '$lib/server/database';
 let db;
 
-export const handle_user_logging_in = async (claims) => {
-
+const is_uid_present = (uid) => {
     if (!db) {
         db = database_handle();
     }
 
-    // if the user is already assigned a (valdi) application-specific
-    // user id, we're done.
-    // FIXME: should check if this name/email already exists in the database?
-	if (claims.application_userid) {
-        // if we're concerned that our userids have leaked or changed,
-        // enable this code
-
-        console.log(`Testing for presence of app user id ${claims.application_userid} in database.`);
-
-        // YOU MUST CONFIGURE: table names, column names.
-        // vvvvvvvvv
-
-        const test_user_validity =
-        `SELECT COUNT(*) as is_valid FROM users WHERE userid = ?`;
-        const test_user_validity_stmt = db.prepare(test_user_validity);
-        const test_user_validitycount = test_user_validity_stmt.get(claims.application_userid)['is_valid'];
-        const user_is_valid = test_user_validitycount == 1;
-
-        if (user_is_valid) {
-            return;
-        }
-        console.log(`ERROR: User ${claims.email} has an invalid application_userid (${claims.application_userid}).`);
-
-        // ^^^^^^^^^
+    const sql = `SELECT COUNT(*) as matching_count FROM users WHERE firebase_uid = ?`;
+    const stmt = db.prepare(sql);
+    const result = stmt.get(uid);
+    const user_is_valid = result.matching_count === 1;
+    if (DEBUG_AUTH) {
+        console.log(`is_uid_present: User ${uid} ${user_is_valid ? 'exists' : 'does not exist'} in database`);
     }
 
-    //console.log("handle_user_logging_in",{claims})
-    const uid = claims['uid'];
+    return user_is_valid;
+}
 
-    // A new (never been seen before) user has signed in.
-    // We need to choose an application-relevant user is for them,
-    // and probably assign basic roles.
-    //
-    // this may also be the best place to assign a default role to all new users,
-    // and the admin role to the first user who logs in.
-    //
+const number_of_users = () => {
+    if (!db) {
+        db = database_handle();
+    }
 
-    // assign a application-specific user id
-
-    // YOU MUST CONFIGURE: table names, column names.
-    // vvvvvvvvv
-
-    const sql = `
-    INSERT INTO
-        users (email_address, name)
-    VALUES
-        (?, ?)`;
+    const sql = `SELECT COUNT(*) as count FROM users`;
 
     const stmt = db.prepare(sql);
-    const info = stmt.run( claims.email, claims.name);
-    const newUserId = info.lastInsertRowid;
+    const result = stmt.get();
+    const user_count = result.count;
+
+    if (DEBUG_AUTH) {
+        console.log(`number_of_users: ${user_count} users in the database`);
+    }
+
+    return user_count;
+}
+
+const create_local_user_record = (uid, email, user_name) => {
+    if (!db) {
+        db = database_handle();
+    }
+
+    const sql = `INSERT INTO users (firebase_uid, email_address, name) VALUES (?, ?, ?)`;
+    const stmt = db.prepare(sql);
+    const info = stmt.run( uid, email, user_name);
 
     if (info.changes !== 1) {
-        console.error("Error creating user record for ",{claims});
+        console.error("Error creating user record for ",{uid, email, user_name});
+        return null;
+    }
+
+    if (DEBUG_AUTH) {
+        console.log("create_local_user_record: created in the database",
+            {firebase_uid: uid, email_address: email,
+                name: user_name, info}
+        );
+    }
+    // the database userid i.e., the primary key
+    return info.lastInsertRowid;
+}
+// ^^^^^^^^^
+
+export const handle_user_logging_in = async (claims) => {
+	if (is_uid_present(claims.uid)) {
+        // no need to add a new user record
         return;
     }
 
-    const user_count_sql = `SELECT COUNT(*) as user_count FROM users`;
-    const user_count_stmt = db.prepare(user_count_sql);
-    const user_count = user_count_stmt.get()['user_count'];
-    const first_user = user_count == 1;
-    console.log({user_count, first_user, newUserId});
+    // A new (never been seen before) user has signed in
+    const application_userid =
+        create_local_user_record(claims.uid, claims.email, claims.name);
 
-    // ^^^^^^^^^
+    if (!application_userid) {
+        return;
+    }
 
-    // "customClaims" is a subset of all claims returned
-    let claimsToSet = {...claims};
+    const claims_to_add = { application_userid, ['approle_'+NEW_USER_ROLE] : true};
+
+    if (DEBUG_AUTH) {
+        console.log(`Adding user ${application_userid}/${claims.email}/${claims.name} with role ${NEW_USER_ROLE}`);
+    }
+
+    if (number_of_users() === 1) {
+        if (DEBUG_AUTH) {
+            console.log(`Adding ${SUPERUSER_ROLE} role to ${application_userid}/${claims.email} (since they are the first user)`);
+        }
+		claims_to_add['approle_'+SUPERUSER_ROLE] = true;
+    }
+
+    // "customClaims" (that we can update) is a subset of all claims returned
+    let claimsToSet = {...claims, ...claims_to_add};
     ["aud", "auth_time", "exp", "iat", "iss", "sub", "firebase"]
         .map( (cl) => delete claimsToSet[cl] );
 
-    // We add either two or three claims.
-    claimsToSet['application_userid'] = newUserId;
-
-    // all new users get this role
-    claimsToSet['approle_'+NEW_USER_ROLE] = true;
-    console.log("New user "+claims.email+" assigned "+NEW_USER_ROLE+" role");
-
-	// Make the first user an admin!
-	if (first_user) {
-		claimsToSet['approle_'+SUPERUSER_ROLE] = true;
-		console.log("Adding "+SUPERUSER_ROLE+" role to "+claims.email+" (since first user)");
-	}
-
-    await serverAuth.setCustomUserClaims(uid, claimsToSet);
+    await serverAuth.setCustomUserClaims(claims.uid, claimsToSet);
 };

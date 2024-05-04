@@ -22,7 +22,7 @@ export const actions = {
 			return response;
 		}
 
-		if ( action != 'grant' && action != 'revoke' && action != 'check' ){
+		if ( ! 'grant,revoke,check,reset,delete'.includes(action) ){
 			response.error = 'Invalid request';
 			return response;
 		}
@@ -42,13 +42,41 @@ export const actions = {
 			return response;
 		}
 
-		const boolForAction = action == 'grant';
+		if (action == 'reset') {
+			const existingClaims = { ...aUser.customClaims };
+			delete existingClaims['application_userid'];
+			await getAuth(firebaseServerApp)
+				.setCustomUserClaims(aUser.uid, existingClaims);
+			response.message = `User ${email} de-registered from the application`;
+			return response;
+		}
+
+		if (action == 'delete') {
+			response.message = `User ${email} deleted from the application`;
+			let count = -1;
+			try {
+				count = await getAuth().deleteUser(aUser.uid);
+			} catch (error) {
+				delete response.message;
+				response.error = `Error deleting user: ${error}`;
+			}
+			if (count == 0) {
+				delete response.message;
+				response.error = `User deletion failed: ${email}`;
+			}
+			return response;
+		}
+
+			const boolForAction = action == 'grant';
 		// Lookup the user associated with the specified uid.
 
 		await getAuth(firebaseServerApp)
-			.setCustomUserClaims(aUser.uid, { ...aUser.customClaims??[], [`approle_${role}`]: boolForAction });
+			.setCustomUserClaims(aUser.uid, {
+				...aUser.customClaims??[],
+				[`approle_${role}`]: boolForAction });
 
-        response.message = `User ${email} ${action}ed "${role}"`;
+		const actio = action == 'grant' ? 'granted' : 'revoked';
+        response.message = `User ${email} ${actio} "${role}"`;
 		return response;
 	}
 };

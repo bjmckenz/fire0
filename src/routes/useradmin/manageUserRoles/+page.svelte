@@ -3,9 +3,9 @@
 	export let form;
 </script>
 
-<button on:click={() => goto("/useradmin")}>User Admin</button>
+<button on:click={() => goto('/useradmin')}>User Admin</button>
 
-{#if form && form.message}
+{#if form && form.message && !form.error }
 	<div class="message">{form.message}</div>
 {/if}
 
@@ -16,22 +16,29 @@
 <div class="section">Enter a user's email, then grant or revoke roles from them.</div>
 
 <form action="?/execute" method="post">
-	<label for="email">User Email:</label>
-	<input type="email" name="email" value={form ? form.email ?? '' : ''} />
-
-	<label for="check">Inquire</label>
-	<input type="radio" name="action" id="check" value="check" />
-
+	<div>
+		<label for="email">User Email:</label>
+		<input type="email" name="email" value={form ? form.email ?? '' : ''} />
+	</div>
 	<div class="roleActions">
-		<label for="role">Role to grant or revoke:</label>
-		<input type="text" id="role" name="role" value={form ? form.role ?? '' : ''} />
+		<div>
+			<label for="role">Role (only for grant or revoke):</label>
+			<input type="text" id="role" name="role" value={form ? form.role ?? '' : ''} />
+		</div>
 
 		<div class="section">Action:</div>
-		<br />
-		<label for="grant">Bestow</label>
-		<input type="radio" name="action" id="grant" value="grant" />
-		<label for="revoke">Smite</label>
-		<input type="radio" name="action" id="revoke" value="revoke" />
+		<div>
+			<input type="radio" name="action" id="check" value="check" />
+			<label for="check">(List Roles)</label>
+			<input type="radio" name="action" id="grant" value="grant" />
+			<label for="grant">Grant</label>
+			<input type="radio" name="action" id="revoke" value="revoke" />
+			<label for="revoke">Revoke</label>
+			<input type="radio" name="action" id="reset" value="reset" />
+			<label for="revoke">(Remove their application_userid)</label>
+			<input type="radio" name="action" id="delete" value="delete" />
+			<label for="revoke">(Delete their app account)</label>
+		</div>
 	</div>
 	<button class="btn" type="submit">Execute</button>
 </form>
@@ -43,7 +50,7 @@
 
 	form {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		/* grid-template-columns: 1fr 1fr; */
 		gap: 1em;
 	}
 
@@ -56,7 +63,7 @@
 	}
 
 	button {
-		grid-column: 1 / -1;
+		/* grid-column: 1 / -1; */
 		font-size: larger;
 		font-weight: bold;
 	}

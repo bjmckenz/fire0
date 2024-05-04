@@ -7,9 +7,15 @@ export const user_data_from_session = async (sessionCookie) => {
 	if (!sessionCookie) {
 		return {};
 	}
-	const allClaims = sessionCookie
-		? await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie, true /** checkRevoked */)
-		: {};
+	let allClaims = {};
+	if (sessionCookie) {
+		try {
+			allClaims = await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie, true);
+		} catch (error) {
+			await console.error(`Error verifying session cookie: ${error}`);
+			return {};
+		}
+	}
 
 	const realUserRec = await getAuth(firebaseServerApp).getUser(allClaims.sub);
 
