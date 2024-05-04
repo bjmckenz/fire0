@@ -1,7 +1,10 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { roles_from_user } from '$lib/roles_from_user';
 	export let data;
 </script>
+
+<button on:click={() => goto("/useradmin")}>User Admin</button>
 
 <div class="section">All Users</div>
 
@@ -12,6 +15,7 @@
 <div class="users">
 	<table>
 		<tr>
+			<th>App User Id</th>
 			<th>Display Name</th>
 			<th>Picture</th>
 			<th>Phone</th>
@@ -21,6 +25,9 @@
 		</tr>
 		{#each data.users as u}
 			<tr>
+				<td
+					>{#if u.customClaims?.application_userid}{u.customClaims.application_userid}{/if}</td
+				>
 				<td
 					>{#if u.displayName}{u.displayName}{/if}</td
 				>

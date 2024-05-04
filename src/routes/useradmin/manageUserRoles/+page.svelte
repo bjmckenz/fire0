@@ -1,6 +1,9 @@
 <script>
+	import { goto } from '$app/navigation';
 	export let form;
 </script>
+
+<button on:click={() => goto("/useradmin")}>User Admin</button>
 
 {#if form && form.message}
 	<div class="message">{form.message}</div>
