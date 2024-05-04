@@ -3,7 +3,7 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { DEBUG_AUTH } from '$env/static/private';
 
-import { uid_for_userid } from '$lib/server/handle_user_logging_in';
+import { uid_for_userid } from '$lib/server/user_functions';
 
 
 export const grant_role_to_user = async (userid, role) => {

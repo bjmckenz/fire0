@@ -1,6 +1,6 @@
 import { firebaseServerApp } from '$lib/server/firebaseServerApp';
 import { getAuth } from 'firebase-admin/auth';
-import { userid_for_email } from '$lib/server/handle_user_logging_in';
+import { userid_for_email } from '$lib/server/user_functions';
 import { grant_role_to_user, revoke_role_from_user, user_roles } from '$lib/server/role_utils';
 import { fail } from '@sveltejs/kit';
 
