@@ -1,82 +1,84 @@
 import { firebaseServerApp } from '$lib/server/firebaseServerApp';
 import { getAuth } from 'firebase-admin/auth';
-import { roles_from_user } from '$lib/roles_from_user';
+import { userid_for_email } from '$lib/server/handle_user_logging_in';
+import { grant_role_to_user, revoke_role_from_user, user_roles } from '$lib/server/role_utils';
+import { fail } from '@sveltejs/kit';
 
 export const actions = {
-	execute: async ({ request }) => {
+	clearApplicationId: async ({ request }) => {
 		const data = await request.formData();
-
-        const email = data.get('email') ?? '';
-		const role = data.get('role') ?? '';
-		const action = data.get('action') ?? '';
-
-		const response = { email, role, action };
-
-        if (!email ) {
-			response.error = 'Email required';
-			return response;
-		}
-
-		if ( !role && (action == 'grant' || action == 'revoke')) {
-			response.error = 'Role required';
-			return response;
-		}
-
-		if ( ! 'grant,revoke,check,reset,delete'.includes(action) ){
-			response.error = 'Invalid request';
-			return response;
-		}
-
+		const email = data.get('email');
 		let aUser;
 		try {
 			aUser = await getAuth(firebaseServerApp).getUserByEmail(email);
 		} catch (error) {
-			response.error = 'No such user';
-			return response;
-		}
-		console.log('aUser', {aUser});
-
-		if (action == 'check') {
-			const claims = roles_from_user(aUser);
-			response.message = `User ${email} has roles: ${claims.join(', ')}`;
-			return response;
+			return fail(422, { email, error: 'No such user - '+error.message, });
 		}
 
-		if (action == 'reset') {
-			const existingClaims = { ...aUser.customClaims };
-			delete existingClaims['application_userid'];
-			await getAuth(firebaseServerApp)
-				.setCustomUserClaims(aUser.uid, existingClaims);
-			response.message = `User ${email} de-registered from the application`;
-			return response;
+		const existingClaims = { ...aUser.customClaims };
+		delete existingClaims['application_userid'];
+		await getAuth(firebaseServerApp).setCustomUserClaims(aUser.uid, existingClaims);
+		return {email, message:`User ${email} de-registered from the application`};
+	},
+	deleteFirebaseAccount: async ({ request }) => {
+		const data = await request.formData();
+		const email = data.get('email');
+		let aUser;
+		try {
+			aUser = await getAuth(firebaseServerApp).getUserByEmail(email);
+		} catch (error) {
+			return fail( 422, {email, error: 'No such user'});
+		}
+		try {
+			count = await getAuth().deleteUser(aUser.uid);
+		} catch (error) {
+			return fail(422,{email, error: `Error removing user: ${error}`});
+		}
+		return { email, message:`User ${email} removed from the application`};
+	},
+	listRoles: async ({ request }) => {
+		const data = await request.formData();
+		const email = data.get('email');
+		const userid = userid_for_email(email);
+		if (!userid) {
+			return fail(422, { email, error: 'No such user', });
+		}
+		const roles = await user_roles(userid);
+		if (roles === null) {
+			return fail(422,{email, error:`Failed.`});
+		}
+		return {email, message:`User ${email} has roles: ${roles.join(', ')}`};
+	},
+
+	grantRole: async ({ request }) => {
+		const data = await request.formData();
+		const email = data.get('email');
+		const role = data.get('role') ?? '';
+
+		if (!role) {
+			return fail(422,{email, error:'Role required'});
 		}
 
-		if (action == 'delete') {
-			response.message = `User ${email} deleted from the application`;
-			let count = -1;
-			try {
-				count = await getAuth().deleteUser(aUser.uid);
-			} catch (error) {
-				delete response.message;
-				response.error = `Error deleting user: ${error}`;
-			}
-			if (count == 0) {
-				delete response.message;
-				response.error = `User deletion failed: ${email}`;
-			}
-			return response;
+		const result = await grant_role_to_user(userid_for_email(email), role);
+		if (result.error) {
+			return fail(422,{email, role, error:result.error});
+		}
+		return {email, role, message: `User ${email} granted "${role}"`};
+	},
+	revokeRole: async ({ request }) => {
+		const data = await request.formData();
+
+		const email = data.get('email');
+		const role = data.get('role') ?? '';
+
+		if (!role) {
+			return fail(422,{email, error:'Role required'});
 		}
 
-			const boolForAction = action == 'grant';
-		// Lookup the user associated with the specified uid.
-
-		await getAuth(firebaseServerApp)
-			.setCustomUserClaims(aUser.uid, {
-				...aUser.customClaims??[],
-				[`approle_${role}`]: boolForAction });
-
-		const actio = action == 'grant' ? 'granted' : 'revoked';
-        response.message = `User ${email} ${actio} "${role}"`;
-		return response;
-	}
+		const result = await revoke_role_from_user(userid_for_email(email), role);
+		if (result.error) {
+			return fail(422,{email, role, error:result.error});
+		}
+		return {email, role, message:`Revoked "${role}" from user ${email}`};
+	},
 };

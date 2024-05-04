@@ -5,11 +5,11 @@
 
 <button on:click={() => goto('/useradmin')}>User Admin</button>
 
-{#if form && form.message && !form.error }
+{#if form?.message && !form?.error}
 	<div class="message">{form.message}</div>
 {/if}
 
-{#if form && form.error}
+{#if form?.error}
 	<div class="bad">{form.error}</div>
 {/if}
 
@@ -18,29 +18,30 @@
 <form action="?/execute" method="post">
 	<div>
 		<label for="email">User Email:</label>
-		<input type="email" name="email" value={form ? form.email ?? '' : ''} />
+		<input required type="email" name="email" value={form?.email ?? ''} />
+	</div>
+	<div>
+		<button class="btn" formaction="?/listRoles" type="submit">List Roles</button>
+		<button class="btn" formaction="?/clearApplicationId" type="submit"
+			>Remove their application_userid</button
+		>
+		<button class="btn" formaction="?/deleteFirebaseAccount" type="submit"
+			>Delete their app account</button
+		>
 	</div>
 	<div class="roleActions">
 		<div>
-			<label for="role">Role (only for grant or revoke):</label>
-			<input type="text" id="role" name="role" value={form ? form.role ?? '' : ''} />
+			<label for="role">Role:</label>
+			<input type="text" id="role" name="role" value={form?.role ?? ''} />
 		</div>
 
-		<div class="section">Action:</div>
 		<div>
-			<input type="radio" name="action" id="check" value="check" />
-			<label for="check">(List Roles)</label>
-			<input type="radio" name="action" id="grant" value="grant" />
-			<label for="grant">Grant</label>
-			<input type="radio" name="action" id="revoke" value="revoke" />
-			<label for="revoke">Revoke</label>
-			<input type="radio" name="action" id="reset" value="reset" />
-			<label for="revoke">(Remove their application_userid)</label>
-			<input type="radio" name="action" id="delete" value="delete" />
-			<label for="revoke">(Delete their app account)</label>
+			<button class="btn" formaction="?/grantRole" type="submit"
+				>Grant</button
+			>
+			<button class="btn" formaction="?/revokeRole" type="submit">Revoke</button>
 		</div>
 	</div>
-	<button class="btn" type="submit">Execute</button>
 </form>
 
 <style>
@@ -58,12 +59,7 @@
 		width: 100%;
 	}
 
-	input[type='radio'] {
-		margin-right: 0.5em;
-	}
-
 	button {
-		/* grid-column: 1 / -1; */
 		font-size: larger;
 		font-weight: bold;
 	}

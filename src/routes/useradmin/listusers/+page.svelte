@@ -41,7 +41,7 @@
 				>
 				<td
 					>{#if u.email}{u.email}
-						{#if u.emailVerified}(verified){/if}{/if}</td
+						{#if u.emailVerified} &checkmark;{/if}{/if}</td
 				>
 				<td
 					>{#if roles_from_user(u)}{#each roles_from_user(u) as r}{r}&nbsp;{/each}{/if}</td

@@ -9,7 +9,7 @@ import { SUPERUSER_ROLE, NEW_USER_ROLE, DEBUG_AUTH } from '$env/static/private';
 import {database_handle} from '$lib/server/database';
 let db;
 
-const is_uid_present = (uid) => {
+export const is_uid_present = (uid) => {
     if (!db) {
         db = database_handle();
     }
@@ -23,6 +23,64 @@ const is_uid_present = (uid) => {
     }
 
     return user_is_valid;
+}
+
+export const uid_for_userid = (userid) => {
+    if (!db) {
+        db = database_handle();
+    }
+    if (!userid) {
+        if (DEBUG_AUTH) {
+            console.log(`uid_for_userid: NULL userid NO Firebase UID`);
+        }
+        return null;
+    }
+
+    const sql = `SELECT firebase_uid FROM users WHERE userid = ?`;
+    const stmt = db.prepare(sql);
+    const result = stmt.get(userid);
+    if (!result) {
+        if (DEBUG_AUTH) {
+            console.log(`uid_for_userid: User ${userid} has NO Firebase UID`);
+        }
+        return null;
+    }
+    const firebase_id = result.firebase_uid;
+
+    if (DEBUG_AUTH) {
+        console.log(`uid_for_userid: User ${userid} has Firebase UID ${firebase_id}`);
+    }
+
+    return firebase_id;
+}
+
+export const userid_for_email = (email) => {
+    if (!db) {
+        db = database_handle();
+    }
+    if (!email) {
+        if (DEBUG_AUTH) {
+            console.log(`userid_for_email: NO userid`);
+        }
+        return null;
+    }
+
+    const sql = `SELECT userid FROM users WHERE email_address = ?`;
+    const stmt = db.prepare(sql);
+    const result = stmt.get(email);
+    if (!result) {
+        if (DEBUG_AUTH) {
+            console.log(`userid_for_email: Email ${email} has NO userid`);
+        }
+        return null;
+    }
+    const userid = result.userid;
+
+    if (DEBUG_AUTH) {
+        console.log(`userid_for_email: Email ${email} has userid ${userid}`);
+    }
+
+    return userid;
 }
 
 const number_of_users = () => {
