@@ -1,13 +1,9 @@
-import Database from 'better-sqlite3';
 
-import {DB_FILE} from '$env/static/private';
+import postgres from 'postgres'
 
-let database;
+// see env variables in .env
+import {PGCONNECT} from '$env/static/private';
 
-export function database_handle() {
-  if (!database) {
-    console.log("opening db: " + DB_FILE);
-    database = new Database(DB_FILE, { fileMustExist: true, /* verbose: console.log */ });
-  }
-  return database;
-}
+const sql = postgres(PGCONNECT, {} )
+
+export default sql;

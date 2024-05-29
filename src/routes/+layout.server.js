@@ -5,6 +5,10 @@ import { roles_from_user } from '$lib/roles_from_user';
 export const load = async ({ cookies, url }) => {
 	const user_record = await user_data_from_session( cookies.get('session') );
 
+	if (user_record === null) {
+		redirect(302, '/');
+	}
+
 	const application_userid = user_record?.customClaims?.application_userid;
 	//console.log("(layout.server.js) application_userid",application_userid);
 

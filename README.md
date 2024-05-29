@@ -1,6 +1,6 @@
 # Firebase + Svelte
 
-A starter pack. Svelte 4.2.7. Vite 5.0.3
+A starter pack. Svelte 4.2.7. Vite 5.0.3, Postgres
 
 ## Overview
 
@@ -33,11 +33,10 @@ That's all!
 
 ## Steps
 
-* clone it
+* git clone [this](https://github.com/bjmckenz/fire0)
 * create your ```.env``` file *(below)*
 * ```npm install```
-* Read and act upon the **Porting from SQLite3 to a server-friendly DB** section below
-  * Which will have you modifying ```src/lib/server/role_utils.js```
+* Implement **Installing and setting up a Pg Database** section (below)
 * modify ```src/lib/server/path_to_role_map.js``` to protect paths, moving routes as necessary
 * See ```src/routes/user/profile/+page.js``` to see how you access the logged-in user's id.
 * ```npm run dev```
@@ -65,29 +64,36 @@ SUPERUSER_ROLE=admin
 NEW_USER_ROLE=user
 ```
 
-If you are using the default/include SQLite3 database, add:
+If you are using Postgres, add:
+
 ```
-DB=./data/sample.db
+PGCONNECT=postgres://bjmckenz@localhost:5432/containers
 ```
 
-If you want to see what is going on with authentication and users, add:
+* Substitute at least your name, and perhaps where your DB is installed.
+
+* If you want to see what is going on with authentication and users, add:
+
 ```
 AUTH_DEBUG=true
 ```
 
-This are your development params.
+These are your development params.
 
 ***DO NOT CHECK THIS FILE INTO GIT/GITHUB***
 
-# Porting from SQLite3 to a server-friendly DB
+# Installing and setting up a Pg Database
 
-Yes, you're going to want to do that. But until you start deploying, SQLite3 is fast and easy.
+2. Install PostgreSQL on your computer, or sign up for a hosted instance
 
-When the time comes, you'll have to make some changes *(with respect to authentication - you're on your own for the rest of your application)*
+3. Create a database (e.g., 'containers')
 
-1. ```src/lib/server/database.js``` returns a persistent connection handle
-2. ```src/lib/server/role_utils.js``` accesses and updates the database on new user creation
-3. ```.env``` *(or your production environment variables)* contains database connection params
+4. Make sure the ```.env``` file mentioned above is set up correctly.
+
+5. Consider installing the "PostgreSQL" VSCode extension by Weijan Chen so you can investigate the DB.
+
+4. Open a PSQL window and paste in the schema (from ```schema.sql```) in it.
+
 
 ## DB Design and Requirements
 

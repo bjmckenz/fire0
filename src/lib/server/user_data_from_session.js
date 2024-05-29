@@ -13,7 +13,7 @@ export const user_data_from_session = async (sessionCookie) => {
 			allClaims = await getAuth(firebaseServerApp).verifySessionCookie(sessionCookie, true);
 		} catch (error) {
 			await console.error(`Error verifying session cookie: ${error}`);
-			return {};
+			return null;
 		}
 	}
 
