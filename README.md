@@ -1,6 +1,6 @@
 # Firebase + Svelte
 
-A starter pack. Svelte 4.2.7. Vite 5.0.3, Postgres
+A starter pack. Svelte 4.2.7. Vite 5.0.3, Postgres 16
 
 ## Overview
 
@@ -34,6 +34,8 @@ That's all!
 ## Steps
 
 * git clone [this](https://github.com/bjmckenz/fire0)
+* * Change the name of the project in ```package.json```
+* * Change the git origin to your account/name in ```.git/config```
 * create your ```.env``` file *(below)*
 * ```npm install```
 * Implement **Installing and setting up a Pg Database** section (below)
@@ -85,14 +87,20 @@ These are your development params.
 # Installing and setting up a Pg Database
 
 2. Install PostgreSQL on your computer, or sign up for a hosted instance
+* * If you are on Windows, install chocolatey.org, then ```choco install postgres```
+* * ** SAVE THE GENERATED PASSWORD from then PS window **
+* * If you are on Mac, install Postgres.app
 
-3. Create a database (e.g., 'containers')
 
-4. Make sure the ```.env``` file mentioned above is set up correctly.
+1. Create a database (e.g., 'containers')
 
-5. Consider installing the "PostgreSQL" VSCode extension by Weijan Chen so you can investigate the DB.
+2. Make sure the ```.env``` file mentioned above is set up correctly.
+
+3. Consider installing the "PostgreSQL" VSCode extension by Weijan Chen so you can investigate the DB.
 
 4. Open a PSQL window and paste in the schema (from ```schema.sql```) in it.
+* * If you have installed the extension above, click the terminal icon shown here
+* ![opening psql](opening_psql.png){ width=10% }
 
 
 ## DB Design and Requirements
