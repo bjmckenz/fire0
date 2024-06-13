@@ -77,7 +77,7 @@ PGCONNECT=postgres://bjmckenz@localhost:5432/containers
 * If you want to see what is going on with authentication and users, add:
 
 ```
-AUTH_DEBUG=true
+DEBUG_AUTH=true
 ```
 
 These are your development params.

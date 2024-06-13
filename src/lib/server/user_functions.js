@@ -65,7 +65,7 @@ export const userid_for_email = async (email) => {
 
     const rows = await sql`
     SELECT
-        firebase_uid
+        userid
     FROM
         users
     WHERE
@@ -103,7 +103,13 @@ export const number_of_users = async () => {
 }
 
 export const create_local_user_record = async (uid, email, user_name) => {
-    const rows = await sql`
+    if (DEBUG_AUTH) {
+        console.log("create_local_user_record: about to create in the database",
+            {firebase_uid: uid, email_address: email,
+                name: user_name}
+        );
+
+const rows = await sql`
     INSERT INTO
         users (firebase_uid, email_address, name)
     VALUES

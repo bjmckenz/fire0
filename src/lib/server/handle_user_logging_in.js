@@ -7,14 +7,18 @@ import { is_uid_present, number_of_users, create_local_user_record } from '$lib/
 
 
 export const handle_user_logging_in = async (claims) => {
-	if (is_uid_present(claims.uid)) {
+    if (DEBUG_AUTH) {
+        console.log(`handle_user_logging_in: ${claims.email} ${claims.name} ${claims.uid}`);
+    }
+
+	if (await is_uid_present(claims.uid)) {
         // no need to add a new user record
         return;
     }
 
     // A new (never been seen before) user has signed in
     const application_userid =
-        create_local_user_record(claims.uid, claims.email, claims.name);
+        await create_local_user_record(claims.uid, claims.email, claims.name);
 
     if (!application_userid) {
         return;

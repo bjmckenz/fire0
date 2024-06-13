@@ -39,7 +39,7 @@ export const actions = {
 	listRoles: async ({ request }) => {
 		const data = await request.formData();
 		const email = data.get('email');
-		const userid = userid_for_email(email);
+		const userid = await userid_for_email(email);
 		if (!userid) {
 			return fail(422, { email, error: 'No such user', });
 		}
@@ -59,7 +59,7 @@ export const actions = {
 			return fail(422,{email, error:'Role required'});
 		}
 
-		const result = await grant_role_to_user(userid_for_email(email), role);
+		const result = await grant_role_to_user(await userid_for_email(email), role);
 		if (result.error) {
 			return fail(422,{email, role, error:result.error});
 		}
@@ -75,7 +75,7 @@ export const actions = {
 			return fail(422,{email, error:'Role required'});
 		}
 
-		const result = await revoke_role_from_user(userid_for_email(email), role);
+		const result = await revoke_role_from_user(await userid_for_email(email), role);
 		if (result.error) {
 			return fail(422,{email, role, error:result.error});
 		}

@@ -7,7 +7,7 @@ import { uid_for_userid } from '$lib/server/user_functions';
 
 
 export const grant_role_to_user = async (userid, role) => {
-    const uid = uid_for_userid(userid);
+    const uid = await uid_for_userid(userid);
     if (!uid) {
         return {error: 'No such user'};
     }
@@ -27,7 +27,7 @@ export const grant_role_to_user = async (userid, role) => {
 }
 
 export const revoke_role_from_user = async (userid, role) => {
-    const uid = uid_for_userid(userid);
+    const uid = await uid_for_userid(userid);
     if (!uid) {
         return {error: 'No such user'};
     }
@@ -47,7 +47,7 @@ export const revoke_role_from_user = async (userid, role) => {
 }
 
 export const user_roles = async (userid) => {
-    const uid = uid_for_userid(userid);
+    const uid = await uid_for_userid(userid);
     if (!uid) {
         return null;
     }
