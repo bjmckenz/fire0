@@ -1,6 +1,7 @@
 import { user_can_access_url } from '$lib/server/user_can_access_url';
 import { user_data_from_session } from '$lib/server/user_data_from_session';
 import { roles_from_user } from '$lib/roles_from_user';
+import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ cookies, url }) => {
 	const user_record = await user_data_from_session( cookies.get('session') );
